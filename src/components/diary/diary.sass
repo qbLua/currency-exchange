@@ -1,0 +1,65 @@
+.diary-wrapper input, select 
+    border: 1px solid #5E9FF2
+    border-radius: 0.3em
+    padding: 0.5em
+
+.diary-wrapper button
+    padding: 0.5em
+    border-radius: 0.3em
+    background-color: #5E9FF2
+    color: #F2F2F2
+    width: fit-content
+
+.diary-header
+    display: flex
+    flex-direction: row
+    gap: 1em
+    align-items: center
+    flex-wrap: wrap
+
+@media (max-width:  500px)
+    .diary-header
+        select
+            width: 80%
+    
+
+.add-note-wrapper
+    display: flex
+    flex-direction: column
+    gap: 0.5em
+    margin: 1em 0
+
+.add-note_row 
+    display:  flex
+    flex-direction: row
+    gap: 0.5em
+
+@media (max-width: 1400px)
+    .add-note_row 
+        flex-direction: column
+
+.text-note-wrapper
+    display: flex
+    flex-direction: row
+    gap: 1em
+    align-items: center
+    margin: 1em 0
+    justify-content: space-between
+    flex-wrap: wrap
+
+.filter-wrapper
+    display: flex
+    flex-direction: row
+    gap: 1em
+    align-items: center
+    margin: 1em 0
+    flex-wrap: wrap
+    div
+        border: 1px solid #5E9FF2
+        border-radius: 0.2em
+        padding: 0.5em
+
+.button-edit-wrapper
+    display: flex
+    flex-direction: row
+    gap: 1em
