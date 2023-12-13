@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { collection, addDoc, getDocs, Timestamp, updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { currencies } from "../converter/currencies";
 import './diary.sass'
-
+import '../../loader.css'
 const DiaryPage = ({ db }) => {
   const { t, i18n } = useTranslation();
   const categories = [
@@ -35,6 +35,15 @@ const DiaryPage = ({ db }) => {
     category: true,
     date: true,
   });
+  const [displayComponent, setDisplayComponent] = React.useState(false)
+  const check = () => {
+    if (window.fx) {
+      setDisplayComponent(true)
+    } else {
+      setTimeout(check, 300)
+    }
+  }
+  React.useEffect(check,[])
   const [editNotes, setEditNotes] = useState([]);
   const calculateBalnce = (history) => {
 
@@ -251,7 +260,7 @@ const DiaryPage = ({ db }) => {
   };
   return (
     <Layout>
-      <div className="diary-wrapper">
+      {displayComponent?<div className="diary-wrapper">
         <div className="diary-header">
           <div id="6">
             {t("balance")}: {balance.toFixed ? balance.toFixed(2) : balance}
@@ -409,7 +418,8 @@ const DiaryPage = ({ db }) => {
                   // </tr>
             );
           })}
-      </div>
+      </div>:<div className="loader-center"><div className="loader"></div></div>}
+      
     </Layout>
   );
 };

@@ -48,7 +48,7 @@ function App() {
       <Route path='login' element={<LoginPage db={db} />}/>
       <Route path='signup' element={<SignupPage db={db} />}/>
       <Route path='convert' element={<MainPage db={db} />}/>
-      <Route path='diary' element={<DiaryPage db={db} />}/>
+      <Route path='diary' element={<DiaryPage db={db} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     </BrowserRouter>
