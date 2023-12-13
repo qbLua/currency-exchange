@@ -52,7 +52,7 @@ const Converter = () => {
         currency.Trend = '(' + (currency.Trend > 0 ? '+' : '−') + Math.abs(currency.Trend).toFixed(1).replace('.', ',') + ')';
         currency.Value = currency.Value.toFixed(4).replace('.', ',');
         return <tr key={key}>{['Nominal', 'Name', 'Value', 'Trend'].map((i) => {
-          return <td key={key + Math.random()}>{currency[i]}</td>
+          return <td key={key + Math.random()}>{i==="Name"?t(currency[i].split(' ').join('')):currency[i]}</td>
         })}</tr>
       }))
 
@@ -72,9 +72,18 @@ const Converter = () => {
     setAmountTo(e.target.value)
     setAmountInFromCurrency(false)
   }
+  const [displayComponent, setDisplayComponent] = React.useState(false)
+  const check = () => {
+    if (window.fx) {
+      setDisplayComponent(true)
+    } else {
+      setTimeout(check, 300)
+    }
+  }
+  React.useEffect(check,[])
   return (
     <Layout>
-
+{displayComponent?
       <div className="convert-wrapper">
         <div>
           <div id="USD">Курс доллара на сегодня: {USD + ''}</div>
@@ -121,10 +130,10 @@ const Converter = () => {
 
             <thead>
 
-              <th>Единиц</th>
-              <th>Валюта</th>
-              <th>Курс</th>
-              <th className="d-none d-md-table-cell"></th>
+              <th>{t("Amount")}</th>
+              <th>{t("Currency")}</th>
+              <th>{t("Rate")}</th>
+              <th>{t("Trend")}</th>
 
             </thead>
 
@@ -133,7 +142,7 @@ const Converter = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div>:<div className="loader-center"><div className="loader"></div></div>}
     </Layout>
   )
 }

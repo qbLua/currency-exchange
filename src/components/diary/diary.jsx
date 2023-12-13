@@ -108,17 +108,28 @@ const DiaryPage = ({ db }) => {
     const newDirection = value === sortValue ? !direction : direction;
     setDirection(newDirection);
     setSortValue(value);
-    let ar = [...history];
 
     const sorted = [...history].sort((a, b) => {
       if (newDirection) {
-        if (a[value] < b[value]) {
-          return -1;
+        if (value === 'amount') {
+          if (+a[value] < +b[value]) {
+            return -1;
+          }
+        } else {
+          if (a[value] < b[value]) {
+            return -1;
+          }
         }
         return 1;
       } else {
-        if (a[value] > b[value]) {
-          return -1;
+        if (value === 'amount') {
+          if (+a[value] > +b[value]) {
+            return -1;
+          }
+        } else {
+          if (a[value] > b[value]) {
+            return -1;
+          }
         }
         return 1;
       }
