@@ -1,10 +1,10 @@
 .layout-wrapper
     background-color: #89ABD9
-    
     display: flex
     flex-direction: column
     align-items: center
-    justify-content: center
+    min-height: 100vh
+   
 
 .layout-content
     background-color: white
@@ -13,3 +13,11 @@
     border-radius: 1em
     padding: 2em
     box-sizing: border-box
+
+@media ( max-width: 500px )
+    .layout-content
+        margin: 2em 0
+        width: 90%
+        padding: 1em
+    
+    
