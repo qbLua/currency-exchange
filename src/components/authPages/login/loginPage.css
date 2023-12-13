@@ -53,7 +53,7 @@ h2{
 }
 input:focus ~ label,
 input:valid ~ label{
-top: -5px;
+top: -15px;
 }
 .inputbox input {
     max-width: 100%;
@@ -103,6 +103,7 @@ label a{
   .lang {
     display: flex;
     column-gap: 0.5em;
+    color: white;
   }
   
   .selected-lang {

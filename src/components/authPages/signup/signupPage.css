@@ -6,6 +6,7 @@
 .lang {
   display: flex;
   column-gap: 0.5em;
+  color: white;
 }
 
 .selected-lang {

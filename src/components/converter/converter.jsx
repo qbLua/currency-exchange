@@ -52,7 +52,7 @@ const Converter = () => {
         currency.Trend = '(' + (currency.Trend > 0 ? '+' : '−') + Math.abs(currency.Trend).toFixed(1).replace('.', ',') + ')';
         currency.Value = currency.Value.toFixed(4).replace('.', ',');
         return <tr key={key}>{['Nominal', 'Name', 'Value', 'Trend'].map((i) => {
-          return <td key={key + Math.random()}>{i==="Name"?t(currency[i].split(' ').join('')):currency[i]}</td>
+          return <td key={key + Math.random()}>{i==="Name"?t(currency[i]):currency[i]}</td>
         })}</tr>
       }))
 
@@ -124,8 +124,8 @@ const Converter = () => {
             setTo={setAmountFrom}
           />
           </div>
-          <h3 style={{margin: '1em 0'}} id="header">{t("cb_rf_cur")} {timeUpdated + ''}</h3>
-          <p style={{marginBottom: '1em'}} id="timestamp">{t("cb_rf_upd")} {timeUpdatedDB + ''}</p>
+          <h3 style={{margin: '1em 0'}} id="header">{t("Курсы валют ЦБ РФ на сегодня")} {timeUpdated + ''}</h3>
+          <p style={{marginBottom: '1em'}} id="timestamp">{t("Последнее обновление базы данных: сегодня")} {timeUpdatedDB + ''}</p>
           <table id="currencies" className='table-content'>
 
             <thead>
