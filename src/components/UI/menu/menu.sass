@@ -1,5 +1,8 @@
 .menu-wrapper
     width: 100%
+    a
+        text-decoration: none
+        color: #5E9FF2
     
     
 .menu-content
@@ -9,15 +12,18 @@
     justify-content: space-between
     width: 100%
     background-color: #F2F2F2
-    padding:  1em 10em
+    padding:  1em 9em
     box-sizing: border-box
     color: #80868C
+    flex-wrap: wrap
+    gap: 1em
 
 .menu-content__btn
     padding: 0.5em
     border-radius: 0.3em
     background-color: #5E9FF2
     color: #F2F2F2
+    width: 100%
 
 
 .menu-content__block-wrapper
@@ -25,6 +31,7 @@
     flex-direction: row
     justify-content: space-between
     gap: 2em
+    flex-wrap: wrap
 
 
 .menu-content__element
@@ -32,3 +39,16 @@
     color: #0460D9
 li
     list-style: none
+
+
+@media ( max-width: 800px )
+    .menu-content
+        justify-content: center    
+@media ( max-width: 600px )
+    .menu-content
+        padding: 1em 5em
+        button
+            width: 100%
+    .menu-content__block-wrapper
+        justify-content: center
+    
