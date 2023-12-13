@@ -410,6 +410,23 @@ const DiaryPage = ({ db }) => {
                   <button onClick={() => deleteNote(i)}>{t("delete")}</button>
                 </div>
               </div>
+            
+                  // <tr className="text-note-wrapper">
+                  //   <td>{record.operation + record.amount}</td>
+                  //   <td>{t(record.currency)}</td>
+                  //   <td>{record.name}</td>
+                  //   <td>{t(record.category)}</td>
+                  //   <td>{new Date(record.date.seconds * 1000)
+                  //     .toISOString()
+                  //     .replace(
+                  //       /(\d\d\d\d)\-(\d\d)\-(\d\d)T(\d\d:\d\d:\d\d).*/,
+                  //       "$4 $3.$2.$1"
+                  //     )}</td>
+                  //   <td className="button-edit-wrapper">
+                  //     <button onClick={() => startEdit(i)}>{t("edit")}</button>
+                  //     <button onClick={() => deleteNote(i)}>{t("delete")}</button>
+                  //   </td>
+                  // </tr>
             );
           })}
       </div>:<div className="loader-center"><div className="loader"></div></div>}
