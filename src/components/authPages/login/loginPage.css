@@ -11,7 +11,7 @@
     min-height: 100vh;
     width: 100%;
     background-color: black;
-    /* background: url("./../../../img/fon.jpg");  */
+    background: url("./../../../img/fon.jpg"); 
     background-position: center;
     background-size: cover;
 

@@ -104,9 +104,9 @@ const AuthPage = ({ db }) => {
                 </label>
               </div>
               <div className="right">
-                <label>
+                {/* <label>
                   <a href="#">{t("forgot_password?")}</a>
-                </label>
+                </label> */}
               </div>
             </div>
             <div className="lang">
