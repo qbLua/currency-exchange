@@ -5,8 +5,11 @@ import { collection, addDoc, getDocs, Timestamp, updateDoc, doc, deleteDoc } fro
 import { currencies } from "../converter/currencies";
 import './diary.sass'
 import '../../loader.css'
+
 const DiaryPage = ({ db }) => {
   const { t, i18n } = useTranslation();
+
+  // Опции селекта категорий
   const categories = [
     {
       name: t("food"),
@@ -19,6 +22,7 @@ const DiaryPage = ({ db }) => {
     { name: t("job"), operation: "+" },
     { name: t("deposit"), operation: "+" },
   ];
+  // Переменные состояния для: записи значений в поля, валидации
   const [history, setHistory] = useState([]);
   const [balance, setBalance] = useState(0);
   const [balanceCurrency, setBalanceCurrency] = useState("RUB");
@@ -35,6 +39,7 @@ const DiaryPage = ({ db }) => {
     category: true,
     date: true,
   });
+  // Проверка что АПИ банк загрузилось
   const [displayComponent, setDisplayComponent] = React.useState(false)
   const check = () => {
     if (window.fx) {
@@ -45,9 +50,9 @@ const DiaryPage = ({ db }) => {
   }
   React.useEffect(check,[])
   const [editNotes, setEditNotes] = useState([]);
+  // Подсчет баланса
   const calculateBalnce = (history) => {
-
-    if (window.fx) {
+      // Проходим по всем записям и складываем или отнимаем их значения (смотря какой тип траты)
       setBalance(
         history.reduce((accumulator, value) => {
           if (value.operation === "-") {
@@ -60,7 +65,7 @@ const DiaryPage = ({ db }) => {
                   .to(balanceCurrency)
               );
             }
-            return accumulator - value.amount;
+            return +accumulator - +value.amount;
           } else {
             if (value.currency !== balanceCurrency) {
               return (
@@ -71,29 +76,37 @@ const DiaryPage = ({ db }) => {
                   .to(balanceCurrency)
               );
             }
-            return accumulator + value.amount;
+            return +accumulator + +value.amount;
           }
         }, 0)
       );
-    } else {
-      setTimeout(() => calculateBalnce(history), 100);
-    }
   };
+
+  // Получение из БД списка записей
   async function getNotes() {
+    // Запрос к АПИ
     const querySnapshot = await getDocs(collection(db, "diaries"));
-    setHistory(querySnapshot.docs.map((doc) => { return { id: doc.id, ...doc.data() } }));
+    const user = localStorage.getItem('user-email')
+    // Получаем только записи относящиеся к этому пользователю
+    const userNotes = querySnapshot.docs.filter((doc)=>doc.data().user===user) 
+    // Устанавливаем в состояние список записей
+    setHistory(userNotes.map((doc) => { return { id: doc.id, ...doc.data() } }));
+    // Устанавливаем состояние для открытия окон редактирования
     setEditNotes(
-      querySnapshot.docs.map((note) => {
+      userNotes.map((note) => {
         return { id: note.id, ...note.data(), editing: false };
       })
     );
-    calculateBalnce(querySnapshot.docs.map((doc) => { return { id: doc.id, ...doc.data() } }))
-    setValidationEdit(querySnapshot.docs.map((note) => {
+    // Считаем баланс
+    calculateBalnce(userNotes.map((doc) => { return { id: doc.id, ...doc.data() } }))
+    // Устанавливаем хук валидации редактирования
+    setValidationEdit(userNotes.map((note) => {
       return {
         amount: true,
         name: true
       };
     }))
+    // Устанавливаем хук валидации для создания записи
     setValidationCreate({
       amount: true,
       name: true,
@@ -101,9 +114,12 @@ const DiaryPage = ({ db }) => {
       date: true,
     })
   }
+  // Получаем записи при загрузке страницы
   useEffect(() => {
     getNotes();
   }, []);
+
+  // Сортировка записей при помощи фильтров
   const sort = (value) => {
     const newDirection = value === sortValue ? !direction : direction;
     setDirection(newDirection);
@@ -144,7 +160,9 @@ const DiaryPage = ({ db }) => {
   useEffect(() => {
   }, [newCategory])
 
+  // Метод добавления записи
   async function create() {
+    // Начальное состояние валидации
     let valid = true;
     let newValid = {
       amount: true,
@@ -152,6 +170,7 @@ const DiaryPage = ({ db }) => {
       category: true,
       date: true,
     };
+    // Проверяем правильность заполнения числового значения
     if (isNaN(+newAmount) || newAmount === 0) {
       valid = false;
       newValid = {
@@ -164,6 +183,7 @@ const DiaryPage = ({ db }) => {
         amount: true,
       };
     }
+    // Проверяем правильность заполнения названия
     if (newName.length <= 3) {
       valid = false;
       newValid = {
@@ -176,7 +196,10 @@ const DiaryPage = ({ db }) => {
         name: true,
       };
     }
+    
+    // Если все верно 
     if (valid) {
+      // Вызываем метот для добавления записи в БД
       await addDoc(collection(db, "diaries"), {
         operation: newCategory.operation,
         amount: newAmount,
@@ -184,21 +207,27 @@ const DiaryPage = ({ db }) => {
         name: newName,
         category: newCategory.name,
         date: Timestamp.fromDate(new Date()),
+        user: localStorage.getItem('user-email')
       })
+      // Обновляем список записей
       getNotes()
+      // Обнуляем поля создания записи
       setNewAmount(0);
       setNewName("");
       setNewCategory(categories[0]);
       setNewCurrency("RUB");
     }
+    // Обновляем значение валидации
     setValidationCreate(newValid);
   };
 
+  // Метод для удаления записи
   async function deleteNote(i) {
     await deleteDoc(doc(db, "diaries", history[i].id))
     getNotes()
   };
 
+  // Запись данных в поля для редактирования
   const writeEdit = (i, field, value) => {
     setEditNotes([
       ...editNotes.slice(0, i),
@@ -210,12 +239,15 @@ const DiaryPage = ({ db }) => {
     ]);
   };
 
+  // Подтвердить редактирование
   async function saveEdit(i) {
+    // Начальное состояние валидации
     let valid = true
     const newEditValid = {
       amount: validationEdit[i].amount,
       name: validationEdit[i].name
     }
+    // Проверяем правильность заполнения
     if (editNotes[i].amount <= 0) {
       valid = false
       newEditValid.amount = false
@@ -228,7 +260,9 @@ const DiaryPage = ({ db }) => {
     } else {
       newEditValid.name = true
     }
+    // Если все верно
     if (valid) {
+      // Вызываем метод для обновления записи в БД
       await updateDoc(doc(db, 'diaries', editNotes[i].id), {
         amount: editNotes[i].amount,
         category: editNotes[i].category,
@@ -236,13 +270,16 @@ const DiaryPage = ({ db }) => {
         name: editNotes[i].name,
         operation: editNotes[i].operation
       });
+      // Обновление записей
       getNotes()
       setEditNotes([])
     }
+    // Обновление значения валидации полей редактирования
     setValidationEdit([
       ...validationEdit.slice(0, i), newEditValid, ...validationEdit.slice(i + 1, validationEdit.length)])
   };
 
+  // Открыть поля для редактирования записи
   const startEdit = (i) => {
     setEditNotes([
       ...editNotes.slice(0, i),
@@ -254,6 +291,7 @@ const DiaryPage = ({ db }) => {
     ]);
   };
 
+  // Отменить редактирование
   const cancelEdit = (i) => {
     setValidationEdit([
       ...validationEdit.slice(0, i), {
@@ -271,12 +309,15 @@ const DiaryPage = ({ db }) => {
   };
   return (
     <Layout>
+      {/* Если АПИ банка загружено, то показать страницу, если нет то лоадер */}
       {displayComponent?<div className="diary-wrapper">
         <div className="diary-header">
+          {/* Отображение баланса */}
           <div id="6">
             {t("balance")}: {balance.toFixed ? balance.toFixed(2) : balance}
             {balanceCurrency}
           </div>
+          {/* Выбор валюты для отображения баланса */}
           <select
             id="5"
             value={balanceCurrency}
@@ -288,6 +329,7 @@ const DiaryPage = ({ db }) => {
               </option>
             ))}
           </select>
+          {/* Смена языка */}
           <div className="lang">
             <span
               onClick={() => i18n.changeLanguage("ru")}
@@ -304,6 +346,7 @@ const DiaryPage = ({ db }) => {
             </span>
           </div>
         </div>
+        {/* Поля для добавления новой записи */}
         <div className="add-note-wrapper">
           <h3 style={{ color: '#5E9FF2' }}> {t("add_diary_note")}</h3>
           <div className="add-note_row">
@@ -344,6 +387,7 @@ const DiaryPage = ({ db }) => {
         </div>
 
         <h1 style={{ color: '#5E9FF2' }} id="3">{t("diary_title")}</h1>
+        {/* Сортировака таблицы по параметрам */}
         <div className="filter-wrapper">
           <h3>Выберите фильтр: </h3>
           <div onClick={() => sort("amount")}>{t("amount")}</div>
@@ -353,6 +397,7 @@ const DiaryPage = ({ db }) => {
           <div onClick={() => sort("currency")}>{t("currency")}</div>
           <div onClick={() => sort("date")}>{t("date")}</div>
         </div>
+        {/* Отображение списка записей */}
         {history &&
           history.map &&
           history.map((record, i) => {
@@ -410,23 +455,6 @@ const DiaryPage = ({ db }) => {
                   <button onClick={() => deleteNote(i)}>{t("delete")}</button>
                 </div>
               </div>
-            
-                  // <tr className="text-note-wrapper">
-                  //   <td>{record.operation + record.amount}</td>
-                  //   <td>{t(record.currency)}</td>
-                  //   <td>{record.name}</td>
-                  //   <td>{t(record.category)}</td>
-                  //   <td>{new Date(record.date.seconds * 1000)
-                  //     .toISOString()
-                  //     .replace(
-                  //       /(\d\d\d\d)\-(\d\d)\-(\d\d)T(\d\d:\d\d:\d\d).*/,
-                  //       "$4 $3.$2.$1"
-                  //     )}</td>
-                  //   <td className="button-edit-wrapper">
-                  //     <button onClick={() => startEdit(i)}>{t("edit")}</button>
-                  //     <button onClick={() => deleteNote(i)}>{t("delete")}</button>
-                  //   </td>
-                  // </tr>
             );
           })}
       </div>:<div className="loader-center"><div className="loader"></div></div>}
