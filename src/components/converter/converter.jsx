@@ -26,26 +26,30 @@ const Converter = () => {
   }
 
   React.useEffect(() => {
+    // Метод для получения таблицы с данными о курсах валют за сегодня
     function CBR_XML_Daily_Ru(rates) {
-      /* Иконка для обозначения тренда */
+      // Иконка для обозначения тренда 
       function trend(current, previous) {
         if (current > previous) return ' ▲';
         if (current < previous) return ' ▼';
         return '';
       }
 
+      // Данные о курсе доллара и евро
       var USDrate = rates.Valute.USD.Value.toFixed(4).replace('.', ',');
       setUSD(USDrate + trend(rates.Valute.USD.Value, rates.Valute.USD.Previous));
       var EURrate = rates.Valute.EUR.Value.toFixed(4).replace('.', ',');
       setEUR(EURrate + trend(rates.Valute.EUR.Value, rates.Valute.EUR.Previous));
 
+      // Когда был обновлен курс
       var date = new Date(rates.Date);
       setTimeUpdated(date.toLocaleDateString());
 
+      // Когда была обновлена БД с информацией о курсах
       var dateUpdated = new Date(rates.Timestamp);
       setTimeUpdatedDB((dateUpdated + '').replace(/\S+$/g, dateUpdated.toLocaleString()));
 
-
+      // Создание рядов с данными о курсах для таблицы
       setValutesList(Object.keys(rates.Valute).map((key) => {
         var currency = rates.Valute[key];
         currency.Trend = currency.Value - currency.Previous;
@@ -57,21 +61,28 @@ const Converter = () => {
       }))
 
     }
+
+    // Получение данных о курсах за сегодня
     fetch('https://www.cbr-xml-daily.ru/daily_jsonp.js').then((response) => {
       response.text().then((result) => {
         CBR_XML_Daily_Ru(JSON.parse(result.match(/(\{.*\})/)[0]))
       })
     })
   }, [])
+
+  // Запись значения валюты, которую надо конвертировать
   function handleFromAmountChange(e) {
     setAmountFrom(e.target.value)
     setAmountInFromCurrency(true)
   }
 
+  // Запись значения валюты которая была конвертирована 
   function handleToAmountChange(e) {
     setAmountTo(e.target.value)
     setAmountInFromCurrency(false)
   }
+
+  // Проверяем что загрузилось АПИ банка
   const [displayComponent, setDisplayComponent] = React.useState(false)
   const check = () => {
     if (window.fx) {
@@ -81,8 +92,11 @@ const Converter = () => {
     }
   }
   React.useEffect(check,[])
+
+  // Возвращаем разметку
   return (
     <Layout>
+      {/* Если АПИ банка загружено, то показать страницу, если нет, то лоадер */}
 {displayComponent?
       <div className="convert-wrapper">
         <div>
